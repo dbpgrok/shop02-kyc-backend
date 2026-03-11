@@ -199,7 +199,7 @@ app.get("/api/order/download-links/:reference", (req, res) => {
     const token = jwt.sign({ trackId }, JWT_SECRET, { expiresIn: "1h" });
     return {
       trackId,
-      title: trackFiles[trackId]?.split('/').pop() || `Track ${trackId}`,
+      title: decodeURIComponent(trackFiles[trackId]?.split('/').pop() || `Track ${trackId}`),
       url: `${req.protocol}://${req.get('host')}/download/${token}`
     };
   });
