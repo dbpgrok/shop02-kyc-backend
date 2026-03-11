@@ -135,13 +135,22 @@ app.get("/api/order/status/:reference", async (req, res) => {
   }
 
   try {
-    const recipient = new PublicKey(WALLET_PUBKEY);
-    const amount = order.totalSol;
-    const refString = order.reference;
+const recipient = new PublicKey(WALLET_PUBKEY);
+const amount = order.totalSol;
+const refString = order.reference;
 
-    // Vérification Solana Pay
-    const found = await findReference(connection, refString, { finality: "confirmed" });
-    await validateTransfer(connection, { recipient, amount, reference: refString }, found.signature, { commitment: "confirmed" });
+// ✅ Conversion en PublicKey obligatoire pour @solana/pay
+const refPublicKey = new PublicKey(refString);
+
+// Vérification Solana Pay
+const found = await findReference(connection, refPublicKey, { finality: "confirmed" });
+await validateTransfer(
+  connection,
+  found.signature,
+  { recipient, amount, reference: refPublicKey },
+  { commitment: "confirmed" }
+);
+
 
     // Paiement validé !
     order.status = "paid";
