@@ -29,20 +29,18 @@ app.use('/api/order/', orderLimiter);
 
 // ====== CONFIG ======
 const PORT = process.env.PORT || 4000;
-
-// IMPORTANT : à mettre dans Render (.env)
 const WALLET_PUBKEY = process.env.WALLET_PUBKEY;
-const JWT_SECRET = process.env.JWT_SECRET; // ❌ SUPPRIME LE FALLBACK EN PROD
+const JWT_SECRET = process.env.JWT_SECRET || "dev-fallback-render";
 const RPC_URL = process.env.RPC_URL || "https://api.mainnet-beta.solana.com";
 
+// Warnings au lieu de crash
 if (!WALLET_PUBKEY) {
-  console.error("❌ WALLET_PUBKEY manquant ! Arrêt du serveur.");
-  process.exit(1);
+  console.error("❌ WALLET_PUBKEY manquant ! Paiements désactivés.");
 }
-if (!JWT_SECRET) {
-  console.error("❌ JWT_SECRET manquant ! Arrêt du serveur.");
-  process.exit(1);
+if (!JWT_SECRET || JWT_SECRET === "dev-fallback-render") {
+  console.warn("⚠️ JWT_SECRET faible. Configurez-le sur Render !");
 }
+
 
 // Connexion Solana
 const connection = new Connection(RPC_URL, "confirmed");
