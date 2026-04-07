@@ -25,14 +25,22 @@ const orderLimiter = rateLimit({
 });
 app.use('/api/order/', orderLimiter);
 
-// CONFIG (tolérant Render)
+// CONFIG
 const PORT = process.env.PORT || 4000;
 const WALLET_PUBKEY = process.env.WALLET_PUBKEY;
-const JWT_SECRET = process.env.JWT_SECRET || "render-dev-fallback";
+const JWT_SECRET = process.env.JWT_SECRET;
 const RPC_URL = process.env.RPC_URL || "https://api.mainnet-beta.solana.com";
 
-if (!WALLET_PUBKEY) console.error("❌ WALLET_PUBKEY manquant");
-if (!JWT_SECRET || JWT_SECRET === "render-dev-fallback") console.warn("⚠️ JWT_SECRET faible");
+if (!WALLET_PUBKEY) {
+  console.error("❌ WALLET_PUBKEY manquant");
+  process.exit(1);
+}
+
+if (!JWT_SECRET) {
+  console.error("❌ JWT_SECRET manquant");
+  process.exit(1);
+}
+
 
 const connection = new Connection(RPC_URL, "confirmed");
 const orders = new Map();
